@@ -29,6 +29,7 @@ src/
 │   ├── claude.rs           # Claude Code: session discovery, transcript parsing
 │   ├── codex.rs            # Codex CLI: session discovery via ps+lsof, JSONL parsing
 │   ├── opencode.rs         # OpenCode: session discovery via ps + SQLite DB parsing
+│   ├── pi.rs               # pi: session discovery via ps+lsof, JSONL transcript parsing
 │   ├── process.rs          # Child process tree (ps) + open ports (lsof) + git stats
 │   └── rate_limit.rs       # Rate limit file reading (~/.claude/abtop-rate-limits.json)
 └── model/
@@ -173,11 +174,18 @@ Rate limits extracted from `token_count` events:
 - Match live PIDs to DB sessions by process cwd. OpenCode does not expose a PID/session mapping, so when multiple DB rows share one cwd, only live PIDs should be assigned and older rows should not be shown as live duplicates.
 - OpenCode contributes session/token/project/port data, but not quota data. Quota remains Claude + Codex only.
 
-### 5. Subagents: `~/.claude/projects/{path}/{sessionId}/subagents/`
+### 5. pi sessions: `~/.pi/agent/sessions/<encoded-cwd>/<timestamp>_<uuid>.jsonl`
+- Discover running `pi` processes via shared `ps` data (`pi` or a node binary whose basename is `pi`), excluding abtop's own descendants.
+- Map PID → transcript via `lsof` when available; otherwise match by cwd + filename timestamp (pi embeds the creation time in the filename: `2026-11-11T18-59-38-725Z_<uuid>.jsonl`). The header line's `cwd` is the source of truth for the directory name (encoding: `--<cwd without leading slash, / and : → ->--`).
+- JSONL line types: `session` (header: id, timestamp, cwd), `message` (roles `user`, `assistant`, `system`, `toolResult`; assistant lines carry `model`, `provider`, `usage` inside the `message` object), `model_change` (top-level `provider` + `modelId`).
+- `toolResult` entries close pending tool rounds (they are not user prompts, so they never open a "thinking" window); a trailing `user` prompt marks the session as thinking/waiting.
+- pi contributes session/token/project/port data, but not quota data. pi is model-agnostic (any provider incl. local llama.cpp), so context window sizes fall back to the 200k default for unknown models.
+
+### 6. Subagents: `~/.claude/projects/{path}/{sessionId}/subagents/`
 - `agent-{hash}.jsonl` — same JSONL format as main transcript
 - `agent-{hash}.meta.json` — `{ "agentType": "general-purpose", "description": "..." }`
 
-### 6. Process tree: `ps` + `lsof`
+### 7. Process tree: `ps` + `lsof`
 ```bash
 ps -eo pid,ppid,rss,%cpu,command    # All processes
 lsof -i -P -n -sTCP:LISTEN         # Open ports
@@ -185,16 +193,16 @@ lsof -i -P -n -sTCP:LISTEN         # Open ports
 - Build parent→children map from ppid
 - Map listening PID → parent agent PID → session
 
-### 7. Git status per project
+### 8. Git status per project
 ```bash
 git -C {cwd} status --porcelain     # added/modified file counts
 ```
 
-### 8. Memory status
+### 9. Memory status
 - Path: `~/.claude/projects/{encoded-path}/memory/`
 - Count files in directory + lines in `MEMORY.md`
 
-### 9. Rate limit (Claude Code)
+### 10. Rate limit (Claude Code)
 
 NOT in transcript JSONL. Collected via StatusLine mechanism.
 
@@ -214,7 +222,7 @@ File format read by abtop:
 - Account-level metric, shared across all sessions.
 - Show "—" when not configured or data unavailable.
 
-### 10. Other files
+### 11. Other files
 - `~/.claude/stats-cache.json` — daily aggregates. Only updated on `/stats`, NOT real-time.
 - `~/.claude/history.jsonl` — prompt history with sessionId.
 

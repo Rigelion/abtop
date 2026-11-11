@@ -160,9 +160,9 @@ impl LaunchSurface {
 
 #[derive(Debug, Clone)]
 pub struct AgentSession {
-    /// Which CLI tool this session belongs to: "claude", "codex", etc.
-    /// Also used as the identifier for the `hidden_agents` config key
-    /// (case-insensitive match).
+    /// Which CLI tool this session belongs to: "claude", "codex",
+    /// "opencode", "pi", etc. Also used as the identifier for the
+    /// `hidden_agents` config key (case-insensitive match).
     pub agent_cli: &'static str,
     /// Which surface launched this session's process (CLI / desktop app / IDE extension).
     pub launch_surface: LaunchSurface,
@@ -222,6 +222,7 @@ pub struct AgentSession {
     /// Config root directory for this session's agent (home-abbreviated, e.g. "~/.claude-work").
     /// For Claude Code: the active .claude* profile folder. For Codex: "~/.codex".
     /// For OpenCode: the data directory containing opencode.db.
+    /// For pi: the agent directory (~/.pi/agent) containing sessions/.
     pub config_root: String,
 }
 

@@ -2,8 +2,8 @@
 
 **Like [btop](https://github.com/aristocratos/btop), but for your AI coding agents.**
 
-See every Claude Code, Codex CLI, and OpenCode session at a glance — token usage, context window %, rate limits, child processes, open ports, and more.
-Claude Code, Codex CLI, and OpenCode sessions are discovered from local process/file state, so multiple active profiles are supported across macOS, Linux, and Windows.
+See every Claude Code, Codex CLI, OpenCode, and pi session at a glance — token usage, context window %, rate limits, child processes, open ports, and more.
+Claude Code, Codex CLI, OpenCode, and pi sessions are discovered from local process/file state, so multiple active profiles are supported across macOS, Linux, and Windows.
 
 ![demo](https://raw.githubusercontent.com/graykode/abtop/main/assets/demo.gif)
 
@@ -75,20 +75,22 @@ tmux new -s work
 
 ## Supported Agents
 
-| Feature           | Claude Code | Codex CLI | OpenCode |
-| ----------------- | :---------: | :-------: | :------: |
-| Session Discovery |     ✅      |    ✅     |    ✅    |
-| Token Tracking    |     ✅      |    ✅     |    ✅    |
-| Context Window %  |     ✅      |    ✅     |    ❌    |
-| Status Detection  |     ✅      |    ✅     |    ✅    |
-| Current Task      |     ✅      |    ✅     |    ❌    |
-| Rate Limit        |     ✅      |    ✅     |    ❌    |
-| Git Status        |     ✅      |    ✅     |    ✅    |
-| Children / Ports  |     ✅      |    ✅     |    ✅    |
-| Subagents         |     ✅      |    ❌     |    ❌    |
-| Memory Status     |     ✅      |    ❌     |    ❌    |
+| Feature           | Claude Code | Codex CLI | OpenCode | pi |
+| ----------------- | :---------: | :-------: | :------: | :-: |
+| Session Discovery |     ✅      |    ✅     |    ✅    | ✅ |
+| Token Tracking    |     ✅      |    ✅     |    ✅    | ✅ |
+| Context Window %  |     ✅      |    ✅     |    ❌    | ✅ |
+| Status Detection  |     ✅      |    ✅     |    ✅    | ✅ |
+| Current Task      |     ✅      |    ✅     |    ❌    | ✅ |
+| Rate Limit        |     ✅      |    ✅     |    ❌    | ❌ |
+| Git Status        |     ✅      |    ✅     |    ✅    | ✅ |
+| Children / Ports  |     ✅      |    ✅     |    ✅    | ✅ |
+| Subagents         |     ✅      |    ❌     |    ❌    | ❌ |
+| Memory Status     |     ✅      |    ❌     |    ❌    | ❌ |
 
 OpenCode support reads the local SQLite database at `~/.local/share/opencode/opencode.db` (also the default location on Windows; `%LOCALAPPDATA%\opencode` and `%APPDATA%\opencode` are probed as fallbacks) and requires `sqlite3` in `PATH` (on Windows: `winget install SQLite.SQLite`).
+
+pi support reads the JSONL transcripts at `~/.pi/agent/sessions/<encoded-cwd>/<timestamp>_<uuid>.jsonl`. pi is model-agnostic (any provider, including local llama.cpp servers), so context window sizes fall back to a 200k default for unknown models. pi exposes no account-level rate limits, so the quota panel shows "—" for pi-only setups.
 
 ## Themes
 

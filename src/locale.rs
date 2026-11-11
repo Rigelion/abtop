@@ -47,6 +47,7 @@ static LOCALE_EN: LazyLock<std::collections::HashMap<&str, &str>> = LazyLock::ne
     // Agent labels
     m.insert("agent.claude", "*CC");
     m.insert("agent.codex", ">CD");
+    m.insert("agent.pi", "~PI");
 
     // Tool labels
     m.insert("tool.bash", "Bash");
@@ -298,6 +299,7 @@ static LOCALE_ZH: LazyLock<std::collections::HashMap<&str, &str>> = LazyLock::ne
     // Agent labels
     m.insert("agent.claude", "*CC");
     m.insert("agent.codex", ">CD");
+    m.insert("agent.pi", "~PI");
 
     // Tool labels
     m.insert("tool.bash", "终端");
